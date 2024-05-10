@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telecommunication Network Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #calculatorContainer {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        select,
+        input[type="number"],
+        button {
+            margin: 5px 0;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #calculationResult {
+            margin-top: 20px;
+        }
+
+        p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="calculatorContainer">                                                                 
+        <h1>Telecommunication Network Calculator</h1>
+        <h3>SELECT YOUR CALCULATION</h3>
+        <form id="calculationForm">
+            <select id="calculationType" onchange="selectCalculation()">
+                <option>Select</option>
+                <option value="telecommunication">Telecommunication Network Availability</option>
+                <option value="internet">Internet Network Reliability</option>
+            </select>
+        </form>
+        <div id="calculatorInputs"></div>
+        <div id="calculationResult"></div>
+    </div>
+
+    <script>
+        function selectCalculation() {
+            var calculationType = document.getElementById("calculationType").value;
+            var calculatorInputs = document.getElementById("calculatorInputs");
+            var calculationResult = document.getElementById("calculationResult");
+
+            calculatorInputs.innerHTML = "";
+            calculationResult.innerHTML = "";
+
+            if (calculationType === "telecommunication") {
+                calculatorInputs.innerHTML = `
+                    <h2>Telecommunication Network Availability</h2>
+                    <label for="observationTime">Observation Time:</label>
+                    <input type="number" id="observationTime" step="0.01">
+                    <br>
+                    <label for="downTime1">Down Time 1:</label>
+                    <input type="number" id="downTime1" step="0.01">
+                    <br>
+                    <label for="downTime2">Down Time 2:</label>
+                    <input type="number" id="downTime2" step="0.01">
+                    <br>
+                    <label for="downTime3">Down Time 3:</label>
+                    <input type="number" id="downTime3" step="0.01">
+                    <br>
+                    <label for="downTime4">Down Time 4:</label>
+                    <input type="number" id="downTime4" step="0.01">
+                    <br>
+                    <button onclick="calculateTelecommunication()">Calculate</button>
+                `;
+            } else if (calculationType === "internet") {
+                calculatorInputs.innerHTML = `
+                    <h2>Internet Network Reliability</h2>
+                    <label for="hi">HI:</label>
+                    <input type="number" id="hi" step="0.01">
+                    <br>
+                    <label for="eo">EO:</label>
+                    <input type="number" id="eo" step="0.01">
+                    <br>
+                    <label for="rtu">RTU:</label>
+                    <input type="number" id="rtu" step="0.01">
+                    <br>
+                    <label for="riu">RIU:</label>
+                    <input type="number" id="riu" step="0.01">
+                    <br>
+                    <label for="ber">BER:</label>
+                    <input type="number" id="ber" step="0.01">
+                    <br>
+                    <label for="dtr">Total Data Transfer in Second:</label>
+                    <input type="number" id="dtr" step="0.01">
+                    <br>
+                    <button onclick="calculateInternet()">Calculate</button>
+                `;
+            }
+        }
+
+        function calculateTelecommunication() {
+            var observationTime = parseFloat(document.getElementById("observationTime").value);
+            var downTime1 = parseFloat(document.getElementById("downTime1").value);
+            var downTime2 = parseFloat(document.getElementById("downTime2").value);
+            var downTime3 = parseFloat(document.getElementById("downTime3").value);
+            var downTime4 = parseFloat(document.getElementById("downTime4").value);
+            var availability = (observationTime - (downTime1 + downTime2 + downTime3 + downTime4))/observationTime;
+
+            var per_observationTime = (observationTime / availability) * 100;
+            var per_downTime1 = (downTime1 / availability) * 100;
+            var per_downTime2 = (downTime2 / availability) * 100;
+            var per_downTime3 = (downTime3 / availability) * 100;
+            var per_downTime4 = (downTime4 / availability) * 100;
+
+            var quality;
+            var per_quality = ((per_observationTime) - (per_downTime1) - (per_downTime2) - (per_downTime3) - (per_downTime4)) / per_observationTime;
+            if ((!isNaN(per_observationTime)) && (!isNaN(per_downTime1)) && (!isNaN(per_downTime2)) && (!isNaN(per_downTime3)) && (!isNaN(per_downTime4))) {
+                if ((per_quality <= 1) && (per_quality > 0.99)) {
+                    quality = "Very Good";
+                } else if ((per_quality <= 0.99) && (per_quality > 0.90)) {
+                    quality = "Fairly Good";
+                } else if ((per_quality <= 0.90) && (per_quality > 0.75)) {
+                    quality = "Enough";
+                } else if ((per_quality <= 0.75) && (per_quality > 0.6)) {
+                    quality = "Bad";
+                } else if ((per_quality <= 0.6)) {
+                    quality = "Poor";
+                }
+            }
+
+            var resultDiv = document.getElementById("calculationResult");
+            resultDiv.innerHTML = `
+                <h2>Result</h2>
+                <p>Network Availability: ${availability.toFixed(2)}</p>
+                <p>Network Quality: ${quality}</p>
+            `;
+
+        }
+
+        function calculateInternet() {
+            var hi = parseFloat(document.getElementById("hi").value);
+            var eo = parseFloat(document.getElementById("eo").value);
+            var rtu = parseFloat(document.getElementById("rtu").value);
+            var riu = parseFloat(document.getElementById("riu").value);
+            var ber = parseFloat(document.getElementById("ber").value);
+            var dtr = parseFloat(document.getElementById("dtr").value);
+
+            var oec = dtr / ber;
+            var handlingOverhead = hi / (1 - hi);
+            var encodingOverhead = eo;
+            var throughputEfficiency = 1 / ((1 + riu) * (1 + rtu));
+            var transactionTime = (dtr * (1 + handlingOverhead) * (1 + encodingOverhead)) / ber ;
+            var networkquality;
+            if (throughputEfficiency <= 1 && throughputEfficiency > 0.999) {
+                networkQuality = "Very Good";
+            } else if (throughputEfficiency <= 0.999 && throughputEfficiency > 0.99) {
+                networkQuality = "Fairly Good";
+            } else if (throughputEfficiency <= 0.99 && throughputEfficiency > 0.75) {
+                networkQuality = "Enough";
+            } else if (throughputEfficiency <= 0.75 && throughputEfficiency > 0.6) {
+                networkQuality = "Bad";
+            } else if (throughputEfficiency <= 0.6 && throughputEfficiency > 0) {
+                networkQuality = "Poor";
+            }
+
+            var resultDiv = document.getElementById("calculationResult");
+            resultDiv.innerHTML = `
+                <h2>Result</h2>
+                <p>OEC (Effective Operational Capacity): ${oec.toFixed(2)}</p>
+                <p>Handling Overhead: ${handlingOverhead.toFixed(2)}</p>
+                <p>Transaction Time: ${transactionTime.toFixed(2)}</p>
+                <p>Throughput Efficiency: ${throughputEfficiency.toFixed(2)}</p>
+                <p>Network Quality: ${networkQuality}</p>
+            `;
+        }
+
+
+    </script>
+</body>
+</html>
